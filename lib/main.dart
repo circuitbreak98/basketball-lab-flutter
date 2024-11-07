@@ -1,7 +1,147 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart' as kakao;
 
-void main() {
-  runApp(const MyApp());
+class AuthService {
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Listen for authentication state changes
+  static Stream<User?> authStateChanges() => _auth.authStateChanges();
+
+  // Sign in with email and password
+  static Future<UserCredential> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return credential;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw Exception('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        throw Exception('Wrong password provided for that user.');
+      }
+      throw Exception(e.message);
+    }
+  }
+
+  // Sign up with email and password
+  static Future<UserCredential> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return credential;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        throw Exception('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        throw Exception('The account already exists for that email.');
+      }
+      throw Exception(e.message);
+    }
+  }
+
+  // Sign out
+  static Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
+  // Get current user
+  static User? get currentUser => _auth.currentUser;
+}
+
+// Modify MyApp to handle auth state
+class AuthStateWrapper extends StatelessWidget {
+  const AuthStateWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: AuthService.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // User is logged in
+        if (snapshot.hasData) {
+          return const MyHomePage(title: 'Welcome Back');
+        }
+
+        // User is not logged in, show the same page but with login state
+        return const MyHomePage(title: 'Please Sign In');
+      },
+    );
+  }
+}
+
+// Add this class after your AuthService class
+class FirestoreService {
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Example: Create a new document
+  static Future<void> createDocument({
+    required String collection,
+    required Map<String, dynamic> data,
+  }) async {
+    await _firestore.collection(collection).add(data);
+  }
+
+  // Example: Get a stream of documents from a collection
+  static Stream<QuerySnapshot> getCollection(String collection) {
+    final userId = AuthService.currentUser?.uid;
+    if (userId == null) {
+      // Return empty stream by using a query that will never match
+      return FirebaseFirestore.instance
+          .collection(collection)
+          .where('userId', isEqualTo: 'none')
+          .snapshots();
+    }
+
+    return _firestore
+        .collection(collection)
+        .where('userId', isEqualTo: userId)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+
+  // ... rest of the method    // ... rest of the method
+  // Example: Update a document
+  static Future<void> updateDocument({
+    required String collection,
+    required String documentId,
+    required Map<String, dynamic> data,
+  }) async {
+    await _firestore.collection(collection).doc(documentId).update(data);
+  }
+
+  // Example: Delete a document
+  static Future<void> deleteDocument({
+    required String collection,
+    required String documentId,
+  }) async {
+    await _firestore.collection(collection).doc(documentId).delete();
+  }
+
+  // Example: Get a single document
+  static Future<DocumentSnapshot> getDocument({
+    required String collection,
+    required String documentId,
+  }) async {
+    return await _firestore.collection(collection).doc(documentId).get();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -13,25 +153,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const AuthStateWrapper(),
     );
   }
 }
@@ -59,61 +184,57 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
+
+    FirestoreService.createDocument(
+      collection: 'counters',
+      data: {
+        'value': _counter,
+        'userId': AuthService.currentUser?.uid,
+        'timestamp': FieldValue.serverTimestamp(),
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirestoreService.getCollection('counters'),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(child: Text('Something went wrong'));
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final documents = snapshot.data?.docs ?? [];
+
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text('Your counts:'),
+                Text(
+                  '$_counter',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                // Display all counter values from Firestore
+                ...documents.map((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return Text('Count: ${data['value']}');
+                }).toList(),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -122,4 +243,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  kakao.KakaoSdk.init(
+    nativeAppKey: '277c3035b0e075c400ab833d6fb5d1a6',
+    javaScriptAppKey: 'cb0c5032a1c8c4fedfc70d6a948f14ec',
+  );
+  runApp(const MyApp());
 }
