@@ -1,3 +1,4 @@
+import 'package:basketball_lab_flutter/loginTest.dart';
 import 'package:flutter/material.dart';
 
 import 'auth_gate.dart';
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthGate(),
+      home: const LoginTestView(),
     );
   }
 }

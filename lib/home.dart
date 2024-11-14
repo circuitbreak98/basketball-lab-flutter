@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,26 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute<ProfileScreen>(
-                  builder: (context) => const ProfileScreen(),
+                  builder: (context) => ProfileScreen(
+                    appBar: AppBar(
+                      title: const Text('User Profile'),
+                    ),
+                    actions: [
+                      SignedOutAction((context) {
+                        Navigator.of(context).pop();
+                      })
+                    ],
+                    children: [
+                      const Divider(),
+                      Padding(
+                        padding: const EdgeInsets.all(2),
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: Image.asset('flutterfire_300x.png'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -28,7 +48,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             Image.asset('dash.png'),
             Text(
-              'Welcome!',
+              'Welcome! name: ${FirebaseAuth.instance.currentUser?.uid}',
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const SignOutButton(),
