@@ -27,16 +27,14 @@ class LoginTestView extends StatelessWidget {
   }
 }
 
-'''
 
-class UserRepository {
-    final userName; 
-    Future<void> removeUser() {}
-    Future<void> loginUser() {}
-    Future<void> rateuser() {}
-}
+// #class UserRepository {
+//     final userName; 
+//     Future<void> removeUser() {}
+//     Future<void> loginUser() {}
+//     Future<void> rateuser() {}
+// }
 
-class PostRepositry {
-    void makePost(title,conntent) {}
-}
-'''
+// class PostRepositry {
+//     void makePost(title,conntent) {}
+//}
