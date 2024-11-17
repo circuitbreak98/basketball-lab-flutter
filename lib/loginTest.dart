@@ -20,16 +20,14 @@ class LoginTestView extends StatelessWidget {
               ],
             );
           } else {
-            
             return SignOutButton();
           }
         });
   }
 }
 
-
 // #class UserRepository {
-//     final userName; 
+//     final userName;
 //     Future<void> removeUser() {}
 //     Future<void> loginUser() {}
 //     Future<void> rateuser() {}
