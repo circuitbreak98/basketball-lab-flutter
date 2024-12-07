@@ -1,3 +1,4 @@
+import 'package:basketball_lab_flutter/storeTest.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -20,7 +21,8 @@ class LoginTestView extends StatelessWidget {
               ],
             );
           } else {
-            return SignOutButton();
+            //return SignOutButton();
+            return StoreTestView();
           }
         });
   }
