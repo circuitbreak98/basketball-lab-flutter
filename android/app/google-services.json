@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "890905270534",
+    "project_id": "basketball-lab-flutter-556e5",
+    "storage_bucket": "basketball-lab-flutter-556e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890905270534:android:d8fcd31e93bbfc5c1b6687",
+        "android_client_info": {
+          "package_name": "com.basketballlab.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "890905270534-k5m8he0tvq6sldq7agdt0gc0ef3r1581.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz-0hcHqQxVVim7mPtg1bP46YdjuXbyr8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "890905270534-k5m8he0tvq6sldq7agdt0gc0ef3r1581.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "890905270534-mht768oj6d8lvkgsi62bkaq48sjjmdeq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.basketballLabFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

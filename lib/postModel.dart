@@ -11,10 +11,6 @@ class PostModel {
     required this.text,
   });
 
-//   factory PostModel.fromJson(Map<String, dynamic> data, String id){
-//     return PostModel(id: id,)
-//   }
-
   factory PostModel.newPost(String title, String text) {
     String generatedId =
         FirebaseFirestore.instance.collection("Posts").doc().id;

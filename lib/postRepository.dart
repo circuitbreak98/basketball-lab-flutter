@@ -6,12 +6,17 @@ class PostRepository {
   static const String _collectionName = "posts";
 
   // Create
-  Future<bool> addPost(PostModel post) async {
+  Future<bool> addPost(String title, String text) async {
     try {
+      // Create a new PostModel instance with a generated ID
+      PostModel post = PostModel.newPost(title, text);
+
+      // Save the new post to Firestore
       await _firestore
           .collection(_collectionName)
           .doc(post.id)
           .set(post.toJson());
+
       return true;
     } catch (e) {
       print('Error adding post: $e');

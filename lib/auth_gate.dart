@@ -1,3 +1,5 @@
+import 'package:basketball_lab_flutter/postTestView.dart';
+import 'package:basketball_lab_flutter/postView.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart'; // new
@@ -59,7 +61,9 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        return const HomeScreen();
+        //return const HomeScreen();
+        //return PostView();
+        return PostTestView();
       },
     );
   }
