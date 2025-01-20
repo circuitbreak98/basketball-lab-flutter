@@ -10,18 +10,44 @@ import 'package:flutter/material.dart';
 import 'postModel.dart';
 import 'postRepository.dart';
 
-class PostTestView extends StatefulWidget {
-  const PostTestView({Key? key}) : super(key: key);
+/// post test view를 post list view 하나 나누고, post write button view 로 나누기
+/// 탭뷰가 post list view와 my profile view를 가지고 있어야함.
+
+class PostListView extends StatelessWidget {
+  const PostListView({super.key});
 
   @override
-  State<PostTestView> createState() => _PostTestViewState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Post List View"), actions: [
+        IconButton(
+            onPressed: () {
+              // page route PostWriteView
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostWriteView(),
+                ),
+              );
+            },
+            icon: Icon(Icons.ac_unit))
+      ]),
+      body: PostListSubView(),
+    );
+  }
 }
 
-class _PostTestViewState extends State<PostTestView> {
+class PostWriteView extends StatefulWidget {
+  const PostWriteView({Key? key}) : super(key: key);
+
+  @override
+  State<PostWriteView> createState() => _PostWriteViewState();
+}
+
+class _PostWriteViewState extends State<PostWriteView> {
   final PostRepository repository = PostRepository();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
-  List<PostModel> _posts = [];
   bool _isLoading = false;
 
   Future<void> _createPost() async {
@@ -46,7 +72,6 @@ class _PostTestViewState extends State<PostTestView> {
       );
       _titleController.clear();
       _textController.clear();
-      await _loadAllPosts(); // Refresh the list after adding a post
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to create post')),
@@ -58,6 +83,53 @@ class _PostTestViewState extends State<PostTestView> {
     });
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Post Test View'),
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.abc_sharp),
+            )
+          ],
+        ),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(children: [
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(labelText: 'Post Title'),
+              ),
+              TextField(
+                controller: _textController,
+                decoration: const InputDecoration(labelText: 'Post Text'),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _createPost,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Create Post'),
+              )
+            ])));
+  }
+}
+
+class PostListSubView extends StatefulWidget {
+  const PostListSubView({Key? key}) : super(key: key);
+
+  @override
+  State<PostListSubView> createState() => _PostListSubViewState();
+}
+
+class _PostListSubViewState extends State<PostListSubView> {
+  final PostRepository repository = PostRepository();
+  List<PostModel> _posts = [];
+  bool _isLoading = false;
+
   Future<void> _loadAllPosts() async {
     setState(() {
       _isLoading = true;
@@ -65,6 +137,7 @@ class _PostTestViewState extends State<PostTestView> {
 
     try {
       final posts = await repository.getAllPosts();
+      print("$posts");
       setState(() {
         _posts = posts;
       });
@@ -87,29 +160,15 @@ class _PostTestViewState extends State<PostTestView> {
 
   @override
   Widget build(BuildContext context) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _loadAllPosts();
+    // });
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Post Test View')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Post Title'),
-            ),
-            TextField(
-              controller: _textController,
-              decoration: const InputDecoration(labelText: 'Post Text'),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _createPost,
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Create Post'),
-            ),
-            const SizedBox(height: 16),
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())

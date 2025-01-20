@@ -47,8 +47,10 @@ class PostRepository {
   // Read all posts
   Future<List<PostModel>> getAllPosts() async {
     try {
-      QuerySnapshot querySnapshot =
-          await _firestore.collection(_collectionName).get();
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(_collectionName)
+          .orderBy('dateCreated', descending: true)
+          .get();
 
       return querySnapshot.docs
           .map((doc) => PostModel.fromJson(
@@ -93,6 +95,7 @@ class PostRepository {
       QuerySnapshot querySnapshot = await _firestore
           .collection(_collectionName)
           .where('userId', isEqualTo: userId)
+          .orderBy('dateCreated', descending: true)
           .get();
 
       return querySnapshot.docs

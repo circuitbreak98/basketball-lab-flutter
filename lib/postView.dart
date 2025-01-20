@@ -93,6 +93,7 @@ class _PostViewState extends State<PostView> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  Text(post.dateCreated.toString()),
                   const SizedBox(height: 8),
                   Expanded(
                     child: Text(
