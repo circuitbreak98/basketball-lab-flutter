@@ -1,8 +1,4 @@
-import 'package:basketball_lab_flutter/loginTest.dart';
-import 'package:basketball_lab_flutter/postTestView.dart';
-import 'package:basketball_lab_flutter/postView.dart';
 import 'package:flutter/material.dart';
-import 'package:basketball_lab_flutter/storeTest.dart';
 import 'auth_gate.dart';
 
 class MyApp extends StatelessWidget {

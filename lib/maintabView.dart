@@ -1,5 +1,5 @@
-import 'package:basketball_lab_flutter/my_profile_view.dart';
-import 'package:basketball_lab_flutter/postTestView.dart';
+import 'package:basketball_lab_flutter/profileView.dart';
+import 'package:basketball_lab_flutter/postListView.dart';
 import 'package:flutter/material.dart';
 
 class MainTabView extends StatelessWidget {
@@ -24,7 +24,7 @@ class MainTabView extends StatelessWidget {
             // 1) The existing PostListView
             PostListView(),
             // 2) The placeholder MyProfileView
-            MyProfileView(),
+            ProfileView(),
           ],
         ),
       ),

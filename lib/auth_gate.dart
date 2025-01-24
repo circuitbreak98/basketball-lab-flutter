@@ -1,5 +1,5 @@
-import 'package:basketball_lab_flutter/main_tab_view.dart';
-import 'package:basketball_lab_flutter/postTestView.dart';
+import 'package:basketball_lab_flutter/maintabView.dart';
+import 'package:basketball_lab_flutter/postListView.dart';
 import 'package:basketball_lab_flutter/postView.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
@@ -15,7 +15,7 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
+      builder: (context, snapshot) {3
         return snapshot.hasData
             ? const MainTabView()
             : SignInScreen(

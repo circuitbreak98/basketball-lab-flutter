@@ -30,7 +30,7 @@ class PostListView extends StatelessWidget {
                 ),
               );
             },
-            icon: Icon(Icons.ac_unit))
+            icon: Icon(Icons.post_add))
       ]),
       body: PostListSubView(),
     );
@@ -85,26 +85,30 @@ class _PostWriteViewState extends State<PostWriteView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(children: [
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Post Title'),
-              ),
-              TextField(
-                controller: _textController,
-                decoration: const InputDecoration(labelText: 'Post Text'),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _createPost,
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text('Create Post'),
-              )
-            ]));
+    return Scaffold(
+      appBar: AppBar(title: const Text('Write a Post')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(children: [
+          TextField(
+            controller: _titleController,
+            decoration: const InputDecoration(labelText: 'Post Title'),
+          ),
+          TextField(
+            controller: _textController,
+            decoration: const InputDecoration(labelText: 'Post Text'),
+            maxLines: 3,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _createPost,
+            child: _isLoading
+                ? const CircularProgressIndicator()
+                : const Text('Create Post'),
+          )
+        ]),
+      ),
+    );
   }
 }
 
