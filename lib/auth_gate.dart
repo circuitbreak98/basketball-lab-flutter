@@ -15,7 +15,7 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {3
+      builder: (context, snapshot) {
         return snapshot.hasData
             ? const MainTabView()
             : SignInScreen(
