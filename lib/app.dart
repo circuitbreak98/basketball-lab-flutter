@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
         ),
         //home: const LoginTestView(),
         //home: LoginTestView(),
-        //home: PostView(),
-        home: AuthGate());
+        //home: PostView()
+        home: AuthGate()
+        );
   }
 }

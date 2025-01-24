@@ -85,17 +85,7 @@ class _PostWriteViewState extends State<PostWriteView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Post Test View'),
-          actions: [
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(Icons.abc_sharp),
-            )
-          ],
-        ),
-        body: Padding(
+    return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(children: [
               TextField(
@@ -114,7 +104,7 @@ class _PostWriteViewState extends State<PostWriteView> {
                     ? const CircularProgressIndicator()
                     : const Text('Create Post'),
               )
-            ])));
+            ]));
   }
 }
 
@@ -137,7 +127,7 @@ class _PostListSubViewState extends State<PostListSubView> {
 
     try {
       final posts = await repository.getAllPosts();
-      print("$posts");
+      //print("$posts");
       setState(() {
         _posts = posts;
       });
