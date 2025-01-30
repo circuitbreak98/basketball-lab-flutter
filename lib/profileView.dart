@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 /// profileView.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,13 +15,18 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final ProfileRepository _repository = ProfileRepository();
-  ProfileModel? _profile;
-  bool _isLoading = true;
+  // ProfileModel? _profile;
+  bool _isLoading = false;
+  ProfileModel? _profile = ProfileModel(
+      uid: "test",
+      displayName: "displayName",
+      email: "email",
+      photoUrl: "https://images.app.goo.gl/dStSuYMTEfajzMDj8");
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    // _loadUserProfile();
   }
 
   Future<void> _loadUserProfile() async {
@@ -28,7 +34,7 @@ class _ProfileViewState extends State<ProfileView> {
     if (user != null) {
       final profile = await _repository.getUserProfile(user.uid);
       setState(() {
-        _profile = profile;
+        // _profile = profile;
         _isLoading = false;
       });
     } else {
@@ -53,16 +59,9 @@ class _ProfileViewState extends State<ProfileView> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Profile photo
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: _profile!.photoUrl.isNotEmpty
-                ? NetworkImage(_profile!.photoUrl)
-                : null,
-            child: _profile!.photoUrl.isEmpty
-                ? const Icon(Icons.person, size: 40)
-                : null,
-          ),
+          if (_profile != null)
+            // Profile photo
+            CircleAvatar(radius: 40, child: const Icon(Icons.person, size: 40)),
           const SizedBox(height: 16),
           // Display Name
           Text(
@@ -73,7 +72,7 @@ class _ProfileViewState extends State<ProfileView> {
           // Email
           Text(_profile!.email),
           const SizedBox(height: 16),
-          
+
           // Add more fields or user actions as you see fit
           ElevatedButton(
             onPressed: () async {
@@ -87,4 +86,3 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 }
-
