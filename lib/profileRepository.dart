@@ -23,7 +23,7 @@ class ProfileRepository {
     }
   }
 
-  /// Optional: create or update a user profile
+  /// Create or update a user profile
   Future<void> setUserProfile(ProfileModel profile) async {
     try {
       await _firestore.collection('users').doc(profile.uid).set({
@@ -33,6 +33,16 @@ class ProfileRepository {
       });
     } catch (e) {
       print('Error setting user profile: $e');
+      throw e; // Re-throw to handle in the UI
     }
+  }
+
+  /// Get the current user's profile
+  Future<ProfileModel?> getCurrentUserProfile() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      return getUserProfile(user.uid);
+    }
+    return null;
   }
 }

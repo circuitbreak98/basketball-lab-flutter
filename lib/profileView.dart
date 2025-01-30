@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-
-/// profileView.dart
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:basketball_lab_flutter/profileRepository.dart';
 import 'package:basketball_lab_flutter/profileModel.dart';
 
+/// profileView.dart
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
 
@@ -15,34 +13,105 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final ProfileRepository _repository = ProfileRepository();
-  // ProfileModel? _profile;
-  bool _isLoading = false;
-  ProfileModel? _profile = ProfileModel(
-      uid: "test",
-      displayName: "displayName",
-      email: "email",
-      photoUrl: "https://images.app.goo.gl/dStSuYMTEfajzMDj8");
+  bool _isLoading = true;
+  ProfileModel? _profile;
+  final _usernameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // _loadUserProfile();
+    _loadUserProfile();
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final profile = await _repository.getUserProfile(user.uid);
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final profile = await _repository.getCurrentUserProfile();
       setState(() {
-        // _profile = profile;
+        _profile = profile;
         _isLoading = false;
       });
-    } else {
-      // No user is signed in
+
+      if (profile == null || profile.displayName.isEmpty) {
+        // Show username setup dialog if no profile or no display name
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showUsernameDialog();
+        });
+      }
+    } catch (e) {
       setState(() {
         _isLoading = false;
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading profile: $e')),
+        );
+      }
     }
+  }
+
+  Future<void> _showUsernameDialog() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Set Your Username'),
+          content: TextField(
+            controller: _usernameController,
+            decoration: const InputDecoration(
+              hintText: 'Enter your username',
+              labelText: 'Username',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () async {
+                if (_usernameController.text.isNotEmpty) {
+                  try {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      final newProfile = ProfileModel(
+                        uid: user.uid,
+                        displayName: _usernameController.text,
+                        email: user.email ?? '',
+                        photoUrl: user.photoURL ?? '',
+                      );
+                      await _repository.setUserProfile(newProfile);
+                      setState(() {
+                        _profile = newProfile;
+                      });
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Username updated successfully')),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error updating username: $e')),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -59,24 +128,32 @@ class _ProfileViewState extends State<ProfileView> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          if (_profile != null)
-            // Profile photo
-            CircleAvatar(radius: 40, child: const Icon(Icons.person, size: 40)),
+          CircleAvatar(
+            radius: 40,
+            backgroundImage: _profile?.photoUrl != null && _profile!.photoUrl.isNotEmpty
+                ? NetworkImage(_profile!.photoUrl)
+                : null,
+            child: _profile?.photoUrl == null || _profile!.photoUrl.isEmpty
+                ? const Icon(Icons.person, size: 40)
+                : null,
+          ),
           const SizedBox(height: 16),
-          // Display Name
           Text(
             _profile!.displayName,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          // Email
           Text(_profile!.email),
           const SizedBox(height: 16),
-
-          // Add more fields or user actions as you see fit
+          ElevatedButton(
+            onPressed: () {
+              _showUsernameDialog();
+            },
+            child: const Text('Change Username'),
+          ),
+          const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () async {
-              // If you allow the user to update or sign out
               await FirebaseAuth.instance.signOut();
             },
             child: const Text('Sign Out'),

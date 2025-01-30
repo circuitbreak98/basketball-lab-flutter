@@ -11,12 +11,20 @@ class ProfileModel {
     required this.photoUrl,
   });
 
-  factory ProfileModel.fromMap(Map<String, dynamic> data, String documentId) {
+  factory ProfileModel.fromMap(Map<String, dynamic> map, String uid) {
     return ProfileModel(
-      uid: documentId,
-      displayName: data['displayName'] ?? '',
-      email: data['email'] ?? '',
-      photoUrl: data['photoUrl'] ?? '',
+      uid: uid,
+      displayName: map['displayName'] ?? '',
+      email: map['email'] ?? '',
+      photoUrl: map['photoUrl'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'displayName': displayName,
+      'email': email,
+      'photoUrl': photoUrl,
+    };
   }
 }
