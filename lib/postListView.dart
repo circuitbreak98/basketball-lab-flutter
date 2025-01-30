@@ -1,18 +1,7 @@
-import 'package:basketball_lab_flutter/postModel.dart';
-import 'package:basketball_lab_flutter/postRepository.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import for DateFormat
-import 'package:flutter/material.dart';
-import 'postModel.dart';
-import 'postRepository.dart';
-
 import 'package:flutter/material.dart';
 import 'postModel.dart';
 import 'postRepository.dart';
 import 'postWriteView.dart';
-
-/// post test view를 post list view 하나 나누고, post write button view 로 나누기
-/// 탭뷰가 post list view와 my profile view를 가지고 있어야함.
 
 class PostListView extends StatelessWidget {
   const PostListView({super.key});
@@ -20,21 +9,25 @@ class PostListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //중첩 scaffold
-      appBar: AppBar(title: Text("Post List View"), actions: [
-        IconButton(
+      // Parent Scaffold
+      appBar: AppBar(
+        title: const Text("Post List View"),
+        actions: [
+          IconButton(
             onPressed: () {
-              // page route PostWriteView
+              // Navigate to PostWriteView
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PostWriteView(),
+                  builder: (context) => const PostWriteView(),
                 ),
               );
             },
-            icon: Icon(Icons.post_add))
-      ]),
-      body: PostListSubView(),
+            icon: const Icon(Icons.post_add),
+          ),
+        ],
+      ),
+      body: const PostListSubView(),
     );
   }
 }
@@ -58,7 +51,6 @@ class _PostListSubViewState extends State<PostListSubView> {
 
     try {
       final posts = await repository.getAllPosts();
-      //print("$posts");
       setState(() {
         _posts = posts;
       });
@@ -81,35 +73,95 @@ class _PostListSubViewState extends State<PostListSubView> {
 
   @override
   Widget build(BuildContext context) {
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _loadAllPosts();
-    // });
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _posts.isEmpty
+              ? const Center(child: Text('No posts available'))
+              : ListView.builder(
+                  itemCount: _posts.length,
+                  itemBuilder: (context, index) {
+                    final post = _posts[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: ListTile(
+                        title: Text(post.title),
+                        subtitle: Text(
+                          post.text,
+                          maxLines: 1, // Show only first line as preview
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onTap: () {
+                          // Navigate to PostDetailView when tapped
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostDetailView(post: post),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+    );
+  }
+}
 
+/// A simple Post Detail View
+class PostDetailView extends StatelessWidget {
+  final PostModel post;
+
+  const PostDetailView({Key? key, required this.post}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(post.title),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _posts.isEmpty
-                      ? const Center(child: Text('No posts available'))
-                      : ListView.builder(
-                          itemCount: _posts.length,
-                          itemBuilder: (context, index) {
-                            final post = _posts[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: ListTile(
-                                title: Text(post.title),
-                                subtitle: Text(post.text),
-                              ),
-                            );
-                          },
-                        ),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Title
+              Text(
+                post.title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              /// Text
+              Text(
+                post.text,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+
+              /// Example showing more post fields if needed
+              Text(
+                'Author: ${post.author}',
+                style: const TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
+              // You can add any other fields here like date, tags, etc.
+
+              // Example "Created At" field
+              Text(
+                'Created At: ${post.dateCreated}',
+                style: const TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
         ),
       ),
     );

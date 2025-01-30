@@ -5,23 +5,25 @@ class PostModel {
   String title;
   String text;
   Timestamp dateCreated;
+  String author;
 
   PostModel({
     required this.id,
     required this.title,
     required this.text,
     required this.dateCreated,
+    required this.author,
   });
 
   factory PostModel.newPost(String title, String text) {
     String generatedId =
         FirebaseFirestore.instance.collection("Posts").doc().id;
     return PostModel(
-      id: generatedId,
-      title: title,
-      text: text,
-      dateCreated: Timestamp.now(),
-    );
+        id: generatedId,
+        title: title,
+        text: text,
+        dateCreated: Timestamp.now(),
+        author: generatedId);
   }
 
   factory PostModel.fromJson(Map<String, dynamic> data, String id) {
@@ -30,6 +32,7 @@ class PostModel {
       title: data['title'] ?? '',
       text: data['text'] ?? '',
       dateCreated: data['dateCreated'] ?? Timestamp.now(),
+      author: data['author'] ?? '',
     );
   }
 
@@ -39,6 +42,7 @@ class PostModel {
       'title': title,
       'text': text,
       'dateCreated': dateCreated,
+      'author': author,
     };
   }
 }
