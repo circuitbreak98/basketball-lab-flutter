@@ -5,14 +5,14 @@ class CommentModel {
   final String text;
   final String authorId;
   final String authorName;
-  final DateTime dateCreated;
+  final Timestamp? dateCreated;
 
   CommentModel({
     required this.id,
     required this.text,
     required this.authorId,
     required this.authorName,
-    required this.dateCreated,
+    this.dateCreated,
   });
 
   factory CommentModel.fromFirestore(DocumentSnapshot doc) {
@@ -21,8 +21,8 @@ class CommentModel {
       id: doc.id,
       text: data['text'] ?? '',
       authorId: data['authorId'] ?? '',
-      authorName: data['authorName'] ?? '',
-      dateCreated: (data['dateCreated'] as Timestamp).toDate(),
+      authorName: data['authorName'] ?? 'Anonymous',
+      dateCreated: data['dateCreated'] as Timestamp?,
     );
   }
 
@@ -31,7 +31,7 @@ class CommentModel {
       'text': text,
       'authorId': authorId,
       'authorName': authorName,
-      'dateCreated': Timestamp.fromDate(dateCreated),
+      'dateCreated': dateCreated,
     };
   }
 }

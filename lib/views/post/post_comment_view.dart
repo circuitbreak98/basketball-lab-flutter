@@ -74,7 +74,9 @@ class PostCommentView extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                comment.dateCreated.toString(),
+                                comment.dateCreated != null
+                                    ? _formatTimestamp(comment.dateCreated!)
+                                    : 'Just now',
                                 style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 12,
@@ -115,6 +117,22 @@ class PostCommentView extends StatelessWidget {
     );
   }
 
+  String _formatTimestamp(Timestamp timestamp) {
+    final DateTime dateTime = timestamp.toDate();
+    final DateTime now = DateTime.now();
+    final Duration difference = now.difference(dateTime);
+
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'Just now';
+    }
+  }
+
   Future<void> _submitComment(BuildContext context) async {
     if (_commentController.text.trim().isEmpty) return;
 
@@ -126,25 +144,31 @@ class PostCommentView extends StatelessWidget {
       return;
     }
 
-    final commentData = {
-      'text': _commentController.text.trim(),
-      'authorId': user.uid,
-      'authorName': user.displayName ?? 'Anonymous',
-      'dateCreated': FieldValue.serverTimestamp(),
-    };
+    try {
+      final commentData = {
+        'text': _commentController.text.trim(),
+        'authorId': user.uid,
+        'authorName': user.displayName ?? 'Anonymous',
+        'dateCreated': Timestamp.now(),
+      };
 
-    // Add comment to Firestore
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(post.id)
-        .collection('comments')
-        .add(commentData);
+      // Add comment to Firestore
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(post.id)
+          .collection('comments')
+          .add(commentData);
 
-    // Update comment count
-    await FirebaseFirestore.instance.collection('posts').doc(post.id).update({
-      'commentCount': FieldValue.increment(1),
-    });
+      // Update comment count
+      await FirebaseFirestore.instance.collection('posts').doc(post.id).update({
+        'commentCount': FieldValue.increment(1),
+      });
 
-    _commentController.clear();
+      _commentController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error posting comment: ${e.toString()}')),
+      );
+    }
   }
 }

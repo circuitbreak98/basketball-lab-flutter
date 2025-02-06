@@ -77,10 +77,19 @@ class _PostListViewState extends State<PostListView> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.comment, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text('${post.commentCount ?? 0}'),
+                                ],
+                              ),
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => PostDetailView(post: post),
+                                  builder: (context) =>
+                                      PostDetailView(post: post),
                                 ),
                               ),
                             ),
@@ -92,4 +101,4 @@ class _PostListViewState extends State<PostListView> {
       ],
     );
   }
-} 
+}
