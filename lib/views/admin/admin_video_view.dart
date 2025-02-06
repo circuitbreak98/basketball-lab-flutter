@@ -75,7 +75,7 @@ class _AdminVideoViewState extends State<AdminVideoView> {
           .collection('featured_videos')
           .doc(id)
           .delete();
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Video deleted successfully')),
       );
@@ -128,6 +128,23 @@ class _AdminVideoViewState extends State<AdminVideoView> {
                       ? const CircularProgressIndicator()
                       : const Text('Add Video'),
                 ),
+                Image.network(
+                    'https://img.youtube.com/vi/Cu8S-xU7E30/default.jpg',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.error),
+                  );
+                }, loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                })
               ],
             ),
           ),
@@ -153,12 +170,30 @@ class _AdminVideoViewState extends State<AdminVideoView> {
                   itemBuilder: (context, index) {
                     final video = videos[index];
                     final data = video.data() as Map<String, dynamic>;
-                    
+                    final videoId = data['videoId'] ?? '';
                     return ListTile(
-                      leading: Image.network(
-                        'https://img.youtube.com/vi/${data['videoId']}/default.jpg',
+                      leading: Container(
                         width: 120,
-                        fit: BoxFit.cover,
+                        height: 90,
+                        child: Image.network(
+                          'https://img.youtube.com/vi/$videoId/mqdefault.jpg',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.error),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                       title: Text(data['title'] ?? ''),
                       subtitle: Text(data['description'] ?? ''),
@@ -184,4 +219,4 @@ class _AdminVideoViewState extends State<AdminVideoView> {
     _descriptionController.dispose();
     super.dispose();
   }
-} 
+}
