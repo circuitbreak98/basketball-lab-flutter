@@ -15,15 +15,15 @@ class PostModel {
     required this.author,
   });
 
-  factory PostModel.newPost(String title, String text) {
-    String generatedId =
-        FirebaseFirestore.instance.collection("Posts").doc().id;
+  factory PostModel.newPost(String title, String text, String authorEmail) {
+    String generatedId = FirebaseFirestore.instance.collection("Posts").doc().id;
     return PostModel(
-        id: generatedId,
-        title: title,
-        text: text,
-        dateCreated: Timestamp.now(),
-        author: generatedId);
+      id: generatedId,
+      title: title,
+      text: text,
+      dateCreated: Timestamp.now(),
+      author: authorEmail,
+    );
   }
 
   factory PostModel.fromJson(Map<String, dynamic> data, String id) {
@@ -45,4 +45,4 @@ class PostModel {
       'author': author,
     };
   }
-}
+} 

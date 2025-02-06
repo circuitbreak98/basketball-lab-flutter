@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'loginView.dart';
-import 'postListView.dart';
+import 'views/auth/login_view.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {

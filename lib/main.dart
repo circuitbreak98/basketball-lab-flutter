@@ -13,14 +13,9 @@ const YOUR_JAVASCRIPT_APP_KEY = 'cb0c5032a1c8c4fedfc70d6a948f14ec';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // KakaoSdk.init(
-  //   nativeAppKey: '${YOUR_NATIVE_APP_KEY}',
-  //   javaScriptAppKey: '${YOUR_JAVASCRIPT_APP_KEY}',
-  // );
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(const App());
 }
