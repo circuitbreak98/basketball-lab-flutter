@@ -5,6 +5,7 @@ import '../../models/profile_model.dart';
 import '../../repositories/profile_repository.dart';
 import '../../views/admin/admin_video_view.dart';
 import '../../services/admin_service.dart';
+import '../admin/admin_reports_view.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -114,8 +115,10 @@ class _ProfileViewState extends State<ProfileView> {
                   // Display Name
                   if (_isEditing)
                     TextField(
-                      decoration: const InputDecoration(labelText: 'Display Name'),
-                      controller: TextEditingController(text: _profile?.displayName),
+                      decoration:
+                          const InputDecoration(labelText: 'Display Name'),
+                      controller:
+                          TextEditingController(text: _profile?.displayName),
                       onChanged: (value) {
                         if (_profile != null) {
                           setState(() {
@@ -159,7 +162,8 @@ class _ProfileViewState extends State<ProfileView> {
                   if (_isEditing)
                     TextField(
                       decoration: const InputDecoration(labelText: 'Location'),
-                      controller: TextEditingController(text: _profile?.location),
+                      controller:
+                          TextEditingController(text: _profile?.location),
                       onChanged: (value) {
                         if (_profile != null) {
                           setState(() {
@@ -207,6 +211,19 @@ class _ProfileViewState extends State<ProfileView> {
                       },
                       child: const Text('Manage Featured Videos'),
                     ),
+
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminReportsView(),
+                        ),
+                      );
+                    },
+                    child: const Text('View Reported Content'),
+                  ),
                 ],
               ),
             ),
@@ -235,4 +252,4 @@ class _ProfileViewState extends State<ProfileView> {
     final date = timestamp.toDate();
     return '${date.month}/${date.year}';
   }
-} 
+}

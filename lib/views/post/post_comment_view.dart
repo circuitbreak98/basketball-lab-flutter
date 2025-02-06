@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/comment_model.dart';
 import '../../models/post_model.dart';
+import '../../models/report_model.dart';
 
 class PostCommentView extends StatelessWidget {
   final PostModel post;
@@ -59,30 +60,36 @@ class PostCommentView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            comment.text,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Text(
-                                comment.authorName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                          ListTile(
+                            title: Text(
+                              comment.text,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Text(
+                                  comment.authorName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                comment.dateCreated != null
-                                    ? _formatTimestamp(comment.dateCreated!)
-                                    : 'Just now',
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
+                                const SizedBox(width: 8),
+                                Text(
+                                  comment.dateCreated != null
+                                      ? _formatTimestamp(comment.dateCreated!)
+                                      : 'Just now',
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.flag_outlined, size: 16),
+                              onPressed: () =>
+                                  _showReportDialog(context, comment),
+                            ),
                           ),
                         ],
                       ),
@@ -169,6 +176,57 @@ class PostCommentView extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error posting comment: ${e.toString()}')),
       );
+    }
+  }
+
+  Future<void> _showReportDialog(
+      BuildContext context, CommentModel comment) async {
+    final reasonController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Report Comment'),
+        content: TextField(
+          controller: reasonController,
+          decoration: const InputDecoration(
+            labelText: 'Reason for reporting',
+            hintText: 'Please describe why you are reporting this comment',
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Report'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && reasonController.text.isNotEmpty) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('reports').add({
+          'contentId': comment.id,
+          'type': ReportType.comment.toString(),
+          'reportedBy': user.email,
+          'reason': reasonController.text,
+          'dateReported': Timestamp.now(),
+          'isResolved': false,
+          'contentPreview': comment.text,
+        });
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Comment reported successfully')),
+          );
+        }
+      }
     }
   }
 }
