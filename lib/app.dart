@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ThemeData, ColorScheme;
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'views/auth/login_view.dart';
 
 class App extends StatelessWidget {
@@ -6,10 +7,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ShadcnApp(
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromColors(
+          colors: {'accent': Color(0xFFFF9000)},
+        ),
+        radius: 12,
       ),
       builder: (context, child) {
         return Scaffold(

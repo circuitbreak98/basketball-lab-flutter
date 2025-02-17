@@ -26,9 +26,10 @@ class LoginView extends StatelessWidget {
           },
           providers: [
             GoogleProvider(
-              clientId: "890905270534-k5m8he0tvq6sldq7agdt0gc0ef3r1581.apps.googleusercontent.com",
+              clientId:
+                  "890905270534-k5m8he0tvq6sldq7agdt0gc0ef3r1581.apps.googleusercontent.com",
             ),
-            EmailAuthProvider(),
+            //EmailAuthProvider(),
           ],
           footerBuilder: (context, action) {
             return const Padding(
@@ -46,4 +47,4 @@ class LoginView extends StatelessWidget {
       },
     );
   }
-} 
+}
