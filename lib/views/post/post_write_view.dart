@@ -15,6 +15,22 @@ class _PostWriteViewState extends State<PostWriteView> {
   final TextEditingController _textController = TextEditingController();
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      _titleController.text = '';
+      _textController.text = '';
+    });
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
+
   Future<void> _createPost() async {
     if (_titleController.text.trim().isEmpty || _textController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

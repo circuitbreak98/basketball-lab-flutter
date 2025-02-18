@@ -5,14 +5,34 @@ import '../../models/comment_model.dart';
 import '../../models/post_model.dart';
 import '../../models/report_model.dart';
 
-class PostCommentView extends StatelessWidget {
+class PostCommentView extends StatefulWidget {
   final PostModel post;
-  final TextEditingController _commentController = TextEditingController();
 
-  PostCommentView({
+  const PostCommentView({
     Key? key,
     required this.post,
   }) : super(key: key);
+
+  @override
+  State<PostCommentView> createState() => _PostCommentViewState();
+}
+
+class _PostCommentViewState extends State<PostCommentView> {
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      _commentController.text = '';
+    });
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +51,7 @@ class PostCommentView extends StatelessWidget {
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('posts')
-                .doc(post.id)
+                .doc(widget.post.id)
                 .collection('comments')
                 .orderBy('dateCreated', descending: true)
                 .snapshots(),
@@ -162,12 +182,12 @@ class PostCommentView extends StatelessWidget {
       // Add comment to Firestore
       await FirebaseFirestore.instance
           .collection('posts')
-          .doc(post.id)
+          .doc(widget.post.id)
           .collection('comments')
           .add(commentData);
 
       // Update comment count
-      await FirebaseFirestore.instance.collection('posts').doc(post.id).update({
+      await FirebaseFirestore.instance.collection('posts').doc(widget.post.id).update({
         'commentCount': FieldValue.increment(1),
       });
 

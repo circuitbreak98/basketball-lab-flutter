@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart' hide ThemeData, ColorScheme;
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'views/auth/login_view.dart';
 
 class App extends StatelessWidget {
@@ -7,13 +7,20 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadcnApp(
+    return MaterialApp(
       theme: ThemeData(
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromColors(
-          colors: {'accent': Color(0xFFFF9000)},
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Color(0xff6750a4), 
+            brightness: Brightness.dark, //다크/라이트 모드 선택 
+            ),
+        useMaterial3: true,
+        textTheme: GoogleFonts.archivoTextTheme(
+          ThemeData.dark().textTheme,
         ),
-        radius: 12,
+        primaryTextTheme: GoogleFonts.archivoTextTheme(
+          ThemeData.dark().primaryTextTheme,
+        ),
       ),
       builder: (context, child) {
         return Scaffold(
