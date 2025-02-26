@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import '../../models/post_model.dart';
-import '../../repositories/post_repository.dart';
-import 'post_write_view.dart';
-import 'post_detail_view.dart';
+import '../../models/guest_board_model.dart';
+import '../../repositories/guest_board_repository.dart';
+import 'guest_board_write_view.dart';
+import 'guest_board_detail_view.dart';
 
-class PostListView extends StatefulWidget {
-  const PostListView({super.key});
+class GuestBoardListView extends StatefulWidget {
+  const GuestBoardListView({super.key});
 
   @override
-  State<PostListView> createState() => _PostListViewState();
+  State<GuestBoardListView> createState() => _GuestBoardListViewState();
 }
 
-class _PostListViewState extends State<PostListView> {
-  final PostRepository _repository = PostRepository();
-  List<PostModel> _posts = [];
+class _GuestBoardListViewState extends State<GuestBoardListView> {
+  final GuestBoardRepository _repository = GuestBoardRepository();
+  List<GuestBoardModel> _posts = [];
   bool _isLoading = false;
 
   Future<void> _loadAllPosts() async {
@@ -42,14 +42,14 @@ class _PostListViewState extends State<PostListView> {
     return Column(
       children: [
         AppBar(
-          title: const Text("Posts"),
+          title: const Text("Guest Board"),
           actions: [
             IconButton(
               icon: const Icon(Icons.post_add),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PostWriteView(
+                  builder: (context) => GuestBoardWriteView(
                     onPostCreated: () => _loadAllPosts(),
                   ),
                 ),
@@ -89,7 +89,7 @@ class _PostListViewState extends State<PostListView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      PostDetailView(post: post),
+                                      GuestBoardDetailView(post: post),
                                 ),
                               ),
                             ),
@@ -101,4 +101,4 @@ class _PostListViewState extends State<PostListView> {
       ],
     );
   }
-}
+} 

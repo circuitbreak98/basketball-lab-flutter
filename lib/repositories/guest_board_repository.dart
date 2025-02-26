@@ -1,25 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/post_model.dart';
+import '../models/guest_board_model.dart';
 
-class PostRepository {
+class GuestBoardRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  static const String _collectionName = "posts";
+  static const String _categoryPath = "categories/guest_board/posts";
 
   Future<bool> addPost(String title, String text) async {
     try {
       final user = _auth.currentUser;
       if (user == null) return false;
       
-      PostModel post = PostModel.newPost(
+      GuestBoardModel post = GuestBoardModel.newPost(
         title, 
         text,
-        user.email ?? 'anonymous',  // Use current user's email
+        user.email ?? 'anonymous',
       );
       
       await _firestore
-          .collection(_collectionName)
+          .collection(_categoryPath)
           .doc(post.id)
           .set(post.toJson());
       return true;
@@ -29,15 +29,15 @@ class PostRepository {
     }
   }
 
-  Future<List<PostModel>> getAllPosts() async {
+  Future<List<GuestBoardModel>> getAllPosts() async {
     try {
       QuerySnapshot querySnapshot = await _firestore
-          .collection(_collectionName)
+          .collection(_categoryPath)
           .orderBy('dateCreated', descending: true)
           .get();
 
       return querySnapshot.docs
-          .map((doc) => PostModel.fromJson(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) => GuestBoardModel.fromJson(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
     } catch (e) {
       print('Error retrieving posts: $e');

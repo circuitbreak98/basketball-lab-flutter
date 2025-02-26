@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/report_model.dart';
-import '../post/post_detail_view.dart';
-import '../../models/post_model.dart';
+import '../../models/general_board_model.dart';
+import '../../views/general_board/general_board_detail_view.dart';
 
 class AdminReportsView extends StatelessWidget {
   const AdminReportsView({Key? key}) : super(key: key);
@@ -101,11 +101,11 @@ class AdminReportsView extends StatelessWidget {
           .get();
 
       if (postDoc.exists && context.mounted) {
-        final post = PostModel.fromFirestore(postDoc);
+        final post = GeneralBoardModel.fromFirestore(postDoc);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PostDetailView(post: post),
+            builder: (context) => GeneralBoardDetailView(post: post),
           ),
         );
       }

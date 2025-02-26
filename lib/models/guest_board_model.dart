@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PostModel {
+class GuestBoardModel {
   String id;
   String title;
   String text;
@@ -8,7 +8,7 @@ class PostModel {
   String author;
   final int commentCount;
 
-  PostModel({
+  GuestBoardModel({
     required this.id,
     required this.title,
     required this.text,
@@ -17,10 +17,9 @@ class PostModel {
     this.commentCount = 0,
   });
 
-  factory PostModel.newPost(String title, String text, String authorEmail) {
-    String generatedId =
-        FirebaseFirestore.instance.collection("Posts").doc().id;
-    return PostModel(
+  factory GuestBoardModel.newPost(String title, String text, String authorEmail) {
+    String generatedId = FirebaseFirestore.instance.collection("categories/guest_board/posts").doc().id;
+    return GuestBoardModel(
       id: generatedId,
       title: title,
       text: text,
@@ -29,21 +28,9 @@ class PostModel {
     );
   }
 
-  factory PostModel.fromJson(Map<String, dynamic> data, String id) {
-    return PostModel(
+  factory GuestBoardModel.fromJson(Map<String, dynamic> data, String id) {
+    return GuestBoardModel(
       id: id,
-      title: data['title'] ?? '',
-      text: data['text'] ?? '',
-      dateCreated: data['dateCreated'] ?? Timestamp.now(),
-      author: data['author'] ?? '',
-      commentCount: data['commentCount'] ?? 0,
-    );
-  }
-
-  factory PostModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return PostModel(
-      id: doc.id,
       title: data['title'] ?? '',
       text: data['text'] ?? '',
       dateCreated: data['dateCreated'] ?? Timestamp.now(),
@@ -62,15 +49,4 @@ class PostModel {
       'commentCount': commentCount,
     };
   }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'text': text,
-      'dateCreated': dateCreated,
-      'author': author,
-      'commentCount': commentCount,
-    };
-  }
-}
+} 

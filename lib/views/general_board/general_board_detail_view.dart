@@ -1,15 +1,14 @@
-import 'package:basketball_lab_flutter/models/report_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../models/post_model.dart';
-import '../../models/comment_model.dart';
-import 'post_comment_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../models/general_board_model.dart';
+import '../../models/report_model.dart';
+import 'general_board_comment_view.dart';
 
-class PostDetailView extends StatelessWidget {
-  final PostModel post;
+class GeneralBoardDetailView extends StatelessWidget {
+  final GeneralBoardModel post;
 
-  const PostDetailView({Key? key, required this.post}) : super(key: key);
+  const GeneralBoardDetailView({Key? key, required this.post}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +54,7 @@ class PostDetailView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: PostCommentView(post: post),
+              child: GeneralBoardCommentView(post: post),
             ),
           ],
         ),
@@ -112,4 +111,4 @@ class PostDetailView extends StatelessWidget {
       }
     }
   }
-}
+} 

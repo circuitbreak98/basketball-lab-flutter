@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../repositories/post_repository.dart';
+import '../../repositories/guest_board_repository.dart';
 
-class PostWriteView extends StatefulWidget {
+class GuestBoardWriteView extends StatefulWidget {
   final VoidCallback? onPostCreated;
-  const PostWriteView({Key? key, this.onPostCreated}) : super(key: key);
+  const GuestBoardWriteView({Key? key, this.onPostCreated}) : super(key: key);
 
   @override
-  State<PostWriteView> createState() => _PostWriteViewState();
+  State<GuestBoardWriteView> createState() => _GuestBoardWriteViewState();
 }
 
-class _PostWriteViewState extends State<PostWriteView> {
-  final PostRepository _repository = PostRepository();
+class _GuestBoardWriteViewState extends State<GuestBoardWriteView> {
+  final GuestBoardRepository _repository = GuestBoardRepository();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
   bool _isLoading = false;

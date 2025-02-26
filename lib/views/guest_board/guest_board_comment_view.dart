@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/comment_model.dart';
-import '../../models/post_model.dart';
+import '../../models/guest_board_model.dart';
 import '../../models/report_model.dart';
 
-class PostCommentView extends StatefulWidget {
-  final PostModel post;
+class GuestBoardCommentView extends StatefulWidget {
+  final GuestBoardModel post;
 
-  const PostCommentView({
+  const GuestBoardCommentView({
     Key? key,
     required this.post,
   }) : super(key: key);
 
   @override
-  State<PostCommentView> createState() => _PostCommentViewState();
+  State<GuestBoardCommentView> createState() => _GuestBoardCommentViewState();
 }
 
-class _PostCommentViewState extends State<PostCommentView> {
+class _GuestBoardCommentViewState extends State<GuestBoardCommentView> {
   final TextEditingController _commentController = TextEditingController();
 
   @override
@@ -50,7 +50,7 @@ class _PostCommentViewState extends State<PostCommentView> {
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection('posts')
+                .collection('categories/guest_board/posts')
                 .doc(widget.post.id)
                 .collection('comments')
                 .orderBy('dateCreated', descending: true)
@@ -107,8 +107,7 @@ class _PostCommentViewState extends State<PostCommentView> {
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.flag_outlined, size: 16),
-                              onPressed: () =>
-                                  _showReportDialog(context, comment),
+                              onPressed: () => _showReportDialog(context, comment),
                             ),
                           ),
                         ],
@@ -181,13 +180,16 @@ class _PostCommentViewState extends State<PostCommentView> {
 
       // Add comment to Firestore
       await FirebaseFirestore.instance
-          .collection('posts')
+          .collection('categories/guest_board/posts')
           .doc(widget.post.id)
           .collection('comments')
           .add(commentData);
 
       // Update comment count
-      await FirebaseFirestore.instance.collection('posts').doc(widget.post.id).update({
+      await FirebaseFirestore.instance
+          .collection('categories/guest_board/posts')
+          .doc(widget.post.id)
+          .update({
         'commentCount': FieldValue.increment(1),
       });
 
@@ -199,8 +201,7 @@ class _PostCommentViewState extends State<PostCommentView> {
     }
   }
 
-  Future<void> _showReportDialog(
-      BuildContext context, CommentModel comment) async {
+  Future<void> _showReportDialog(BuildContext context, CommentModel comment) async {
     final reasonController = TextEditingController();
 
     final result = await showDialog<bool>(
@@ -249,4 +250,4 @@ class _PostCommentViewState extends State<PostCommentView> {
       }
     }
   }
-}
+} 
