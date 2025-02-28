@@ -5,6 +5,7 @@ import '../models/video_model.dart';
 import '../constants/app_constants.dart';
 import '../repositories/video_repository.dart';
 import '../widgets/youtube_thumbnail.dart';
+import '../widgets/hover_animated_container.dart';
 
 class VideoCarousel extends StatelessWidget {
   final VideoRepository _repository;
@@ -16,7 +17,7 @@ class VideoCarousel extends StatelessWidget {
   static final CarouselOptions _carouselOptions = CarouselOptions(
     height: 200.0,
     aspectRatio: 16/9,
-    viewportFraction: 0.8,
+    viewportFraction: 1.0,
     initialPage: 0,
     enableInfiniteScroll: true,
     reverse: false,
@@ -25,6 +26,8 @@ class VideoCarousel extends StatelessWidget {
     autoPlayAnimationDuration: Duration(milliseconds: 800),
     autoPlayCurve: Curves.fastOutSlowIn,
     enlargeCenterPage: true,
+    enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+    padEnds: false,
     scrollDirection: Axis.horizontal,
   );
 
@@ -54,56 +57,63 @@ class VideoCarousel extends StatelessWidget {
           return Center(child: Text(AppConstants.noVideosMessage));
         }
 
-        return CarouselSlider(
-          options: _carouselOptions,
-          items: videos.map((video) {
-            return GestureDetector(
-              onTap: () => _launchVideo(video.videoId),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.0),
-                  child: Stack(
-                    children: [
-                      YouTubeThumbnail(
-                        videoId: video.videoId,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.7),
-                            ],
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Center(
+            child: CarouselSlider.builder(
+              options: _carouselOptions,
+              itemCount: videos.length,
+              itemBuilder: (context, index, realIndex) {
+                final video = videos[index];
+                return HoverAnimatedContainer(
+                  onTap: () => _launchVideo(video.videoId),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Stack(
+                        children: [
+                          YouTubeThumbnail(
+                            videoId: video.videoId,
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text(
-                            video.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                video.title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
-          }).toList(),
+                );
+              },
+            ),
+          ),
         );
       },
     );

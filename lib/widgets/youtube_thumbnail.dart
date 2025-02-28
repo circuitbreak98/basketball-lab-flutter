@@ -22,6 +22,7 @@ class YouTubeThumbnail extends StatelessWidget {
       fit: fit,
       width: width,
       height: height,
+      alignment: Alignment.center,
       errorBuilder: (context, error, stackTrace) {
         return Container(
           color: Colors.grey[300],
