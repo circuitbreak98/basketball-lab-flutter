@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
 import '../../models/guest_board_model.dart';
 import '../../repositories/guest_board_repository.dart';
 import '../base/base_board_list_view.dart';
@@ -19,7 +20,7 @@ class _GuestBoardListViewState extends BaseBoardListViewState<GuestBoardModel> {
   GuestBoardRepository get repository => _repository;
 
   @override
-  String get boardTitle => "Guest Board";
+  String get boardTitle => AppConstants.guestBoardName;
 
   @override
   Widget Function(GuestBoardModel) get createDetailView => 

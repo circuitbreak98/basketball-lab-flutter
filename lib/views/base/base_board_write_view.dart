@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
 import '../../repositories/base_board_repository.dart';
 import '../../models/base_board_model.dart';
 
@@ -36,7 +37,7 @@ abstract class BaseBoardWriteViewState<T extends BaseBoardModel> extends State<B
   Future<void> _createPost() async {
     if (_titleController.text.trim().isEmpty || _textController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Title and text are required')),
+        const SnackBar(content: Text(AppConstants.postRequiredMessage)),
       );
       return;
     }
@@ -46,10 +47,13 @@ abstract class BaseBoardWriteViewState<T extends BaseBoardModel> extends State<B
     
     if (success && mounted) {
       widget.onPostCreated?.call();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppConstants.postSuccessMessage)),
+      );
       Navigator.pop(context);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to create post')),
+        SnackBar(content: Text(AppConstants.errorLoadingMessage)),
       );
     }
     
@@ -60,7 +64,7 @@ abstract class BaseBoardWriteViewState<T extends BaseBoardModel> extends State<B
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AppBar(title: const Text('Write a Post')),
+        AppBar(title: const Text(AppConstants.writePostTitle)),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -68,11 +72,18 @@ abstract class BaseBoardWriteViewState<T extends BaseBoardModel> extends State<B
               children: [
                 TextField(
                   controller: _titleController,
-                  decoration: const InputDecoration(labelText: 'Post Title'),
+                  decoration: const InputDecoration(
+                    labelText: AppConstants.postTitleLabel,
+                    border: OutlineInputBorder(),
+                  ),
                 ),
+                const SizedBox(height: 8),
                 TextField(
                   controller: _textController,
-                  decoration: const InputDecoration(labelText: 'Post Text'),
+                  decoration: const InputDecoration(
+                    labelText: AppConstants.postContentLabel,
+                    border: OutlineInputBorder(),
+                  ),
                   maxLines: 3,
                 ),
                 const SizedBox(height: 16),
@@ -80,7 +91,7 @@ abstract class BaseBoardWriteViewState<T extends BaseBoardModel> extends State<B
                   onPressed: _isLoading ? null : _createPost,
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('Create Post'),
+                      : const Text(AppConstants.writeButtonLabel),
                 )
               ],
             ),

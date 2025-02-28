@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/date_utils.dart';
 
 enum ReportType { post, comment }
 
@@ -50,5 +51,9 @@ class ReportModel {
       'isResolved': isResolved,
       'contentPreview': contentPreview,
     };
+  }
+
+  String get formattedDate {
+    return AppDateUtils.formatDate(dateReported);
   }
 }

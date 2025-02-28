@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/date_utils.dart';
 
 abstract class BaseBoardModel {
   String id;
@@ -30,5 +31,9 @@ abstract class BaseBoardModel {
 
   static T fromJson<T extends BaseBoardModel>(Map<String, dynamic> data, String id, T Function(Map<String, dynamic>, String) fromJson) {
     return fromJson(data, id);
+  }
+
+  String get formattedDate {
+    return AppDateUtils.formatDate(dateCreated);
   }
 } 

@@ -13,45 +13,28 @@ class AdminService {
 
   Future<bool> isAdmin() async {
     final user = _auth.currentUser;
-    if (user == null) {
-      print('DEBUG: No user logged in');
-      return false;
-    }
+    if (user == null) return false;
 
     try {
-      if (_cachedAdmin != null) {
-        print('DEBUG: Using cached admin data');
-        return true;
-      }
+      if (_cachedAdmin != null) return true;
 
-      print('DEBUG: Checking admin document for email: ${user.email}');
       final doc = await _firestore
           .collection('admins')
           .doc(user.email)
           .get();
 
-      if (!doc.exists) {
-        print('DEBUG: No admin document found');
-        return false;
-      }
+      if (!doc.exists) return false;
 
-      print('DEBUG: Admin document found: ${doc.data()}');
       _cachedAdmin = AdminModel.fromJson(doc.data()!);
       return true;
     } catch (e) {
-      print('DEBUG: Error checking admin status: $e');
       return false;
     }
   }
 
   Future<bool> hasRole(String role) async {
-    if (!await isAdmin()) {
-      print('DEBUG: User is not an admin');
-      return false;
-    }
-    final hasRole = _cachedAdmin?.hasRole(role) ?? false;
-    print('DEBUG: Checking role "$role": $hasRole');
-    return hasRole;
+    if (!await isAdmin()) return false;
+    return _cachedAdmin?.hasRole(role) ?? false;
   }
 
   void clearCache() {

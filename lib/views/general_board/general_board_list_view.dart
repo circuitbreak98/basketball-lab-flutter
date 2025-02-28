@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
 import '../../models/general_board_model.dart';
 import '../../repositories/general_board_repository.dart';
 import '../base/base_board_list_view.dart';
@@ -19,7 +20,7 @@ class _GeneralBoardListViewState extends BaseBoardListViewState<GeneralBoardMode
   GeneralBoardRepository get repository => _repository;
 
   @override
-  String get boardTitle => "General Board";
+  String get boardTitle => AppConstants.generalBoardName;
 
   @override
   Widget Function(GeneralBoardModel) get createDetailView => 

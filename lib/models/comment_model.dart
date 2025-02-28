@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../utils/date_utils.dart';
+import '../constants/app_constants.dart';
 
 class CommentModel {
   final String id;
@@ -26,12 +28,16 @@ class CommentModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'text': text,
       'authorId': authorId,
       'authorName': authorName,
       'dateCreated': dateCreated,
     };
+  }
+
+  String get formattedDate {
+    return dateCreated != null ? AppDateUtils.formatDate(dateCreated!) : AppConstants.noDateText;
   }
 }

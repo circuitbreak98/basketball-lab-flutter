@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../constants/app_constants.dart';
 import '../../models/video_model.dart';
 import '../../services/admin_service.dart';
+import '../../widgets/youtube_thumbnail.dart';
 
 class AdminVideoView extends StatefulWidget {
   const AdminVideoView({Key? key}) : super(key: key);
@@ -24,13 +26,11 @@ class _AdminVideoViewState extends State<AdminVideoView> {
   }
 
   Future<void> _checkAccess() async {
-    print('DEBUG: Checking admin access');
     final hasAccess = await _adminService.hasRole('admin');
-    print('DEBUG: Has admin access: $hasAccess');
     if (!hasAccess && mounted) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Access denied')),
+        SnackBar(content: Text(AppConstants.accessDeniedMessage)),
       );
     }
   }
@@ -38,7 +38,7 @@ class _AdminVideoViewState extends State<AdminVideoView> {
   Future<void> _addVideo() async {
     if (_titleController.text.isEmpty || _videoIdController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Title and Video ID are required')),
+        const SnackBar(content: Text(AppConstants.videoRequiredMessage)),
       );
       return;
     }
@@ -46,50 +46,60 @@ class _AdminVideoViewState extends State<AdminVideoView> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseFirestore.instance.collection('featured_videos').add({
-        'title': _titleController.text,
-        'videoId': _videoIdController.text,
-        'description': _descriptionController.text,
-        'createdAt': FieldValue.serverTimestamp(),
+      await FirebaseFirestore.instance
+          .collection(AppConstants.featuredVideosPath)
+          .add({
+        AppConstants.titleField: _titleController.text,
+        AppConstants.videoIdField: _videoIdController.text,
+        AppConstants.videoDescriptionField: _descriptionController.text,
+        AppConstants.dateCreatedField: FieldValue.serverTimestamp(),
       });
 
       _titleController.clear();
       _videoIdController.clear();
       _descriptionController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Video added successfully')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppConstants.videoAddedMessage)),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error adding video: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppConstants.errorLoadingMessage)),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _deleteVideo(String id) async {
     try {
       await FirebaseFirestore.instance
-          .collection('featured_videos')
+          .collection(AppConstants.featuredVideosPath)
           .doc(id)
           .delete();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Video deleted successfully')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppConstants.videoDeletedMessage)),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting video: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppConstants.errorLoadingMessage)),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage Featured Videos')),
+      appBar: AppBar(title: const Text(AppConstants.videoManagementTitle)),
       body: Column(
         children: [
           Padding(
@@ -99,7 +109,7 @@ class _AdminVideoViewState extends State<AdminVideoView> {
                 TextField(
                   controller: _titleController,
                   decoration: const InputDecoration(
-                    labelText: 'Video Title',
+                    labelText: AppConstants.videoTitleLabel,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -107,16 +117,16 @@ class _AdminVideoViewState extends State<AdminVideoView> {
                 TextField(
                   controller: _videoIdController,
                   decoration: const InputDecoration(
-                    labelText: 'YouTube Video ID',
+                    labelText: AppConstants.videoIdLabel,
                     border: OutlineInputBorder(),
-                    helperText: 'Example: dQw4w9WgXcQ (from YouTube URL)',
+                    helperText: AppConstants.videoIdHelper,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _descriptionController,
                   decoration: const InputDecoration(
-                    labelText: 'Description',
+                    labelText: AppConstants.videoDescriptionLabel,
                     border: OutlineInputBorder(),
                   ),
                   maxLines: 2,
@@ -126,79 +136,53 @@ class _AdminVideoViewState extends State<AdminVideoView> {
                   onPressed: _isLoading ? null : _addVideo,
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('Add Video'),
+                      : const Text(AppConstants.videoAddButtonLabel),
                 ),
-                Image.network(
-                    'https://img.youtube.com/vi/Cu8S-xU7E30/default.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.error),
-                  );
-                }, loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                })
               ],
             ),
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
-                  .collection('featured_videos')
-                  .orderBy('createdAt', descending: true)
+                  .collection(AppConstants.featuredVideosPath)
+                  .orderBy(AppConstants.dateCreatedField, descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(child: Text(AppConstants.errorLoadingMessage));
                 }
 
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final videos = snapshot.data!.docs;
+                final videos = snapshot.data!.docs
+                    .map((doc) => VideoModel.fromFirestore(doc))
+                    .toList();
+
+                if (videos.isEmpty) {
+                  return Center(child: Text(AppConstants.noVideosMessage));
+                }
 
                 return ListView.builder(
                   itemCount: videos.length,
                   itemBuilder: (context, index) {
                     final video = videos[index];
-                    final data = video.data() as Map<String, dynamic>;
-                    final videoId = data['videoId'] ?? '';
                     return ListTile(
-                      leading: Container(
+                      leading: SizedBox(
                         width: 120,
                         height: 90,
-                        child: Image.network(
-                          'https://img.youtube.com/vi/$videoId/mqdefault.jpg',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.error),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
+                        child: YouTubeThumbnail(
+                          videoId: video.videoId,
+                          width: 120,
+                          height: 90,
                         ),
                       ),
-                      title: Text(data['title'] ?? ''),
-                      subtitle: Text(data['description'] ?? ''),
+                      title: Text(video.title),
+                      subtitle: Text(video.description),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
+                        tooltip: AppConstants.videoDeleteTooltip,
                         onPressed: () => _deleteVideo(video.id),
                       ),
                     );

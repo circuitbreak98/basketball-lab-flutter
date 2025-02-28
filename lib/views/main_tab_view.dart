@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../constants/app_constants.dart';
 import 'general_board/general_board_list_view.dart';
+import 'guest_board/guest_board_list_view.dart';
 import 'profile/profile_view.dart';
 import '../widgets/video_carousel.dart';
-import 'guest_board/guest_board_list_view.dart';
 
 class MainTabView extends StatefulWidget {
   const MainTabView({Key? key}) : super(key: key);
@@ -12,7 +13,7 @@ class MainTabView extends StatefulWidget {
 }
 
 class _MainTabViewState extends State<MainTabView> {
-  String _selectedBoard = 'general_board';
+  String _selectedBoard = AppConstants.generalBoard;
 
   @override
   Widget build(BuildContext context) {
@@ -20,22 +21,22 @@ class _MainTabViewState extends State<MainTabView> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Basketball Lab'),
+          title: const Text(AppConstants.appTitle),
         ),
         body: Column(
           children: [
             const SizedBox(height: 16),
-            const VideoCarousel(),
+            VideoCarousel(),
             const SizedBox(height: 16),
             SegmentedButton<String>(
               segments: const [
                 ButtonSegment(
-                  value: 'general_board',
-                  label: Text('General Board'),
+                  value: AppConstants.generalBoard,
+                  label: Text(AppConstants.generalBoardName),
                 ),
                 ButtonSegment(
-                  value: 'guest_board',
-                  label: Text('Guest Board'),
+                  value: AppConstants.guestBoard,
+                  label: Text(AppConstants.guestBoardName),
                 ),
               ],
               selected: {_selectedBoard},
@@ -49,7 +50,7 @@ class _MainTabViewState extends State<MainTabView> {
             Expanded(
               child: TabBarView(
                 children: [
-                  _selectedBoard == 'general_board'
+                  _selectedBoard == AppConstants.generalBoard
                       ? const GeneralBoardListView()
                       : const GuestBoardListView(),
                   const ProfileView(),
@@ -62,8 +63,8 @@ class _MainTabViewState extends State<MainTabView> {
           color: Theme.of(context).primaryColor,
           child: const TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.list), text: 'Posts'),
-              Tab(icon: Icon(Icons.person), text: 'Profile'),
+              Tab(icon: Icon(Icons.list), text: AppConstants.boardTabLabel),
+              Tab(icon: Icon(Icons.person), text: AppConstants.profileTabLabel),
             ],
           ),
         ),

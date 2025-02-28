@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
 import '../../models/base_board_model.dart';
 import '../../models/report_model.dart';
 import '../../services/base_report_service.dart';
+import '../../utils/date_utils.dart';
 
 abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWidget {
   final T post;
@@ -19,6 +21,7 @@ abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWi
         actions: [
           IconButton(
             icon: const Icon(Icons.flag),
+            tooltip: AppConstants.reportPostTooltip,
             onPressed: () => _showReportDialog(context),
           ),
         ],
@@ -42,7 +45,7 @@ abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWi
             ),
             const SizedBox(height: 16),
             Text(
-              'Author: ${post.author}',
+              '${AppConstants.authorLabel}${post.author}',
               style: const TextStyle(
                 fontStyle: FontStyle.italic,
                 color: Colors.grey,
@@ -50,10 +53,15 @@ abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWi
             ),
             const SizedBox(height: 8),
             Text(
-              'Created At: ${post.dateCreated}',
+              '${AppConstants.dateLabel}${post.formattedDate}',
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
+            const Text(
+              AppConstants.commentsTitle,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
             Expanded(
               child: createCommentView(post),
             ),
@@ -69,23 +77,23 @@ abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWi
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Report Post'),
+        title: const Text(AppConstants.reportPostTitle),
         content: TextField(
           controller: reasonController,
           decoration: const InputDecoration(
-            labelText: 'Reason for reporting',
-            hintText: 'Please describe why you are reporting this post',
+            labelText: AppConstants.reportReasonLabel,
+            hintText: AppConstants.reportReasonHint,
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text(AppConstants.cancelButtonLabel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Report'),
+            child: const Text(AppConstants.reportButtonLabel),
           ),
         ],
       ),
@@ -102,13 +110,13 @@ abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWi
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Post reported successfully')),
+            const SnackBar(content: Text(AppConstants.reportSuccessMessage)),
           );
         }
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error reporting post: $e')),
+            SnackBar(content: Text(AppConstants.errorLoadingMessage)),
           );
         }
       }

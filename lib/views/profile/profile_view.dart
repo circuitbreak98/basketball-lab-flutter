@@ -48,7 +48,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> _checkAdminStatus() async {
     final isAdmin = await _adminService.isAdmin();
-    print('DEBUG: Is admin in profile: $isAdmin'); // Debug print
+    //print('DEBUG: Is admin in profile: $isAdmin'); // Debug print
     if (mounted) {
       setState(() => _isAdmin = isAdmin);
     }

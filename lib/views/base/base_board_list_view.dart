@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
 import '../../models/base_board_model.dart';
 import '../../repositories/base_board_repository.dart';
 
@@ -26,7 +27,7 @@ abstract class BaseBoardListViewState<T extends BaseBoardModel> extends State<Ba
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading posts: $e')),
+          SnackBar(content: Text(AppConstants.errorLoadingMessage)),
         );
       }
     } finally {
@@ -49,6 +50,7 @@ abstract class BaseBoardListViewState<T extends BaseBoardModel> extends State<Ba
           actions: [
             IconButton(
               icon: const Icon(Icons.post_add),
+              tooltip: AppConstants.writePostTooltip,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -66,32 +68,38 @@ abstract class BaseBoardListViewState<T extends BaseBoardModel> extends State<Ba
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _posts.isEmpty
-                    ? const Center(child: Text('No posts available'))
+                    ? Center(child: Text(AppConstants.noPostsMessage))
                     : ListView.builder(
                         itemCount: _posts.length,
                         itemBuilder: (context, index) {
                           final post = _posts[index];
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: ListTile(
-                              title: Text(post.title),
-                              subtitle: Text(
-                                post.text,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.comment, size: 16),
-                                  const SizedBox(width: 4),
-                                  Text('${post.commentCount ?? 0}'),
-                                ],
-                              ),
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => createDetailView(post),
+                            child: Tooltip(
+                              message: AppConstants.viewPostTooltip,
+                              child: ListTile(
+                                title: Text(post.title),
+                                subtitle: Text(
+                                  post.text,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.comment, size: 16),
+                                    const SizedBox(width: 4),
+                                    Tooltip(
+                                      message: AppConstants.commentCountTooltip,
+                                      child: Text('${post.commentCount ?? 0}'),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => createDetailView(post),
+                                  ),
                                 ),
                               ),
                             ),
