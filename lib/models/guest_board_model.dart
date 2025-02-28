@@ -1,20 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'base_board_model.dart';
 
-class GuestBoardModel {
-  String id;
-  String title;
-  String text;
-  Timestamp dateCreated;
-  String author;
-  final int commentCount;
-
+class GuestBoardModel extends BaseBoardModel {
   GuestBoardModel({
-    required this.id,
-    required this.title,
-    required this.text,
-    required this.dateCreated,
-    required this.author,
-    this.commentCount = 0,
+    required super.id,
+    required super.title,
+    required super.text,
+    required super.dateCreated,
+    required super.author,
+    super.commentCount,
   });
 
   factory GuestBoardModel.newPost(String title, String text, String authorEmail) {
@@ -39,14 +33,18 @@ class GuestBoardModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'text': text,
-      'dateCreated': dateCreated,
-      'author': author,
-      'commentCount': commentCount,
-    };
+  factory GuestBoardModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return GuestBoardModel(
+      id: doc.id,
+      title: data['title'] ?? '',
+      text: data['text'] ?? '',
+      dateCreated: data['dateCreated'] ?? Timestamp.now(),
+      author: data['author'] ?? '',
+      commentCount: data['commentCount'] ?? 0,
+    );
   }
+
+  @override
+  Map<String, dynamic> toJson() => super.toJson();
 } 

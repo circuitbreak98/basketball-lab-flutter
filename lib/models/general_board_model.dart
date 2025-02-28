@@ -1,24 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'base_board_model.dart';
 
-class GeneralBoardModel {
-  String id;
-  String title;
-  String text;
-  Timestamp dateCreated;
-  String author;
-  final int commentCount;
-
+class GeneralBoardModel extends BaseBoardModel {
   GeneralBoardModel({
-    required this.id,
-    required this.title,
-    required this.text,
-    required this.dateCreated,
-    required this.author,
-    this.commentCount = 0,
+    required super.id,
+    required super.title,
+    required super.text,
+    required super.dateCreated,
+    required super.author,
+    super.commentCount,
   });
 
   factory GeneralBoardModel.newPost(String title, String text, String authorEmail) {
-    String generatedId = FirebaseFirestore.instance.collection("general_board").doc().id;
+    String generatedId = FirebaseFirestore.instance.collection("categories/general_board/posts").doc().id;
     return GeneralBoardModel(
       id: generatedId,
       title: title,
@@ -51,14 +45,6 @@ class GeneralBoardModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'text': text,
-      'dateCreated': dateCreated,
-      'author': author,
-      'commentCount': commentCount,
-    };
-  }
+  @override
+  Map<String, dynamic> toJson() => super.toJson();
 } 

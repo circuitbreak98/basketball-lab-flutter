@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../models/general_board_model.dart';
+import '../../models/base_board_model.dart';
 import '../../models/report_model.dart';
-import '../base/base_board_detail_view.dart';
-import 'general_board_comment_view.dart';
 import '../../services/base_report_service.dart';
-import '../../services/general_board_service.dart';
 
-class GeneralBoardDetailView extends BaseBoardDetailView<GeneralBoardModel> {
-  GeneralBoardDetailView({super.key, required super.post});
+abstract class BaseBoardDetailView<T extends BaseBoardModel> extends StatelessWidget {
+  final T post;
 
-  final GeneralBoardService _service = GeneralBoardService();
+  const BaseBoardDetailView({Key? key, required this.post}) : super(key: key);
 
-  @override
-  Widget createCommentView(GeneralBoardModel post) => GeneralBoardCommentView(post: post);
-
-  @override
-  BaseReportService get reportService => _service;
+  Widget createCommentView(T post);
+  BaseReportService get reportService;
 
   @override
   Widget build(BuildContext context) {
@@ -100,21 +92,23 @@ class GeneralBoardDetailView extends BaseBoardDetailView<GeneralBoardModel> {
     );
 
     if (result == true && reasonController.text.isNotEmpty) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await FirebaseFirestore.instance.collection('reports').add({
-          'contentId': post.id,
-          'type': ReportType.post.toString(),
-          'reportedBy': user.email,
-          'reason': reasonController.text,
-          'dateReported': Timestamp.now(),
-          'isResolved': false,
-          'contentPreview': post.title,
-        });
+      try {
+        await reportService.reportContent(
+          contentId: post.id,
+          type: ReportType.post,
+          reason: reasonController.text,
+          contentPreview: post.title,
+        );
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Post reported successfully')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error reporting post: $e')),
           );
         }
       }

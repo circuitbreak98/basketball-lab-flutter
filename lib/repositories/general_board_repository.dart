@@ -1,43 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/general_board_model.dart';
+import '../repositories/base_board_repository.dart';
 
-class GeneralBoardRepository {
+class GeneralBoardRepository extends BaseBoardRepository<GeneralBoardModel> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  static const String _categoryPath = "categories/general_board/posts";
 
-  Future<bool> addPost(String title, String text) async {
-    try {
-      final user = _auth.currentUser;
-      if (user == null) return false;
-      
-      GeneralBoardModel post = GeneralBoardModel.newPost(
-        title, 
-        text,
-        user.email ?? 'anonymous',
-      );
-      
-      await _firestore
-          .collection(_categoryPath)
-          .doc(post.id)
-          .set(post.toJson());
-      return true;
-    } catch (e) {
-      print('Error adding post: $e');
-      return false;
-    }
-  }
+  @override
+  String get categoryPath => "categories/general_board/posts";
+
+  @override
+  GeneralBoardModel Function(Map<String, dynamic>, String) get fromJson => 
+      GeneralBoardModel.fromJson;
+
+  @override
+  GeneralBoardModel Function(String, String, String) get newPost => 
+      (title, text, author) => GeneralBoardModel.newPost(title, text, author);
 
   Future<List<GeneralBoardModel>> getAllPosts() async {
     try {
       QuerySnapshot querySnapshot = await _firestore
-          .collection(_categoryPath)
+          .collection(categoryPath)
           .orderBy('dateCreated', descending: true)
           .get();
 
       return querySnapshot.docs
-          .map((doc) => GeneralBoardModel.fromJson(doc.data() as Map<String, dynamic>, doc.id))
+          .map((doc) => fromJson(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
     } catch (e) {
       print('Error retrieving posts: $e');
